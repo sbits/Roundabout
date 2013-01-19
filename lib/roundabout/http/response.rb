@@ -12,26 +12,30 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+		All adjustments made by @author Christian Pedaschus <chris@sbits.ac>
+		use the original license. Thanks 'Zapotek' :)
+
 =end
 
 #
 # @author Tasos "Zapotek" Laskos <tasos.laskos@gmail.com>
 #
 class Roundabout::HTTP::Response
-    # @return   [Integer]   response code
-    attr_reader :code
+	# @return   [Integer]   response code
+	attr_reader :code
 
-    # @return   [String]   effective url
-    attr_reader :url
+	# @return   [String]   effective url
+	attr_reader :url
 
-    # @return   [String]   response body
-    attr_reader :body
+	# @return   [String]   response body
+	attr_reader :body
 
-    # @return   [Hash]   response headers
-    attr_reader :headers
+	# @return   [Hash]   response headers
+	attr_reader :headers
 
-    # @param    [Hash]    opts
-    def initialize( opts )
-        opts.each { |k, v| instance_variable_set( "@#{k}".to_sym, v ) }
-    end
+	# @param    [Hash]    opts
+	def initialize(opts)
+		opts.each { |k, v| instance_variable_set("@#{k}".to_sym, v) }
+	end
 end

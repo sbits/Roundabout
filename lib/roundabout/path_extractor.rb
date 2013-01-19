@@ -12,6 +12,10 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+		All adjustments made by @author Christian Pedaschus <chris@sbits.ac>
+		use the original license. Thanks 'Zapotek' :)
+
 =end
 
 #
@@ -21,14 +25,17 @@
 #
 class Roundabout::PathExtractor
 
-    def run( doc )
-        URI.extract( doc.to_s, 'http' ) |
-        doc.search( "//link[@href]" ).map { |a| a['href'] } |
-        doc.search( "//a[@href]" ).map { |a| a['href'] } |
-        doc.search( "//form[@action]" ).map { |a| a['action'] } |
-        doc.css( 'frame', 'iframe' ).map { |a| a.attributes['src'].content rescue next } |
-        doc.search( "//meta[@http-equiv='refresh']" ).
-            map { |url| url['content'].split( ';' )[1].split( '=' )[1] }
-    end
+	def run(doc)
+		URI.extract(doc.to_s, 'http') |
+				doc.search("//link[@href]").map { |a| a['href'] } |
+				doc.search("//script[@src]").map { |a| a['src'] if a['src'][0] == "/" } |
+				doc.search("//img[@src]").map { |a| a['src'] } |
+				doc.search("//a[@href]").map { |a| a['href'] } |
+				doc.search("//form[@action]").map { |a| a['action'] } |
+				doc.css('frame', 'iframe').map { |a| a.attributes['src'].content rescue next } |
+				doc.search("//meta[@http-equiv='refresh']").
+						map { |url| url['content'].split(';')[1].split('=')[1] }
+
+	end
 
 end

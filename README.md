@@ -6,6 +6,13 @@ when it comes to website crawling.
 The name comes from the overall philosophy of the system which is to avoid centralized
 decision making points and instead focus on an intuitive prioritization and distribution algorithm.
 
+# Fork Notice:
+
+We needed a distributed high-speed crawler which gives us access to the raw (downloaded) data, to replace 'wget' in our static-rails-website-dumper.
+By using 'roundabout' and some custom Parser-Classes (namely css- and ajax-path-extractors), we are able to dump our dynamic rails applications as plain old html/css/js/json files.
+
+## !!!!!!!!!!!!!!!!!!! THIS IS WORK-IN-PROGRESS... use on your own risk !!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!
+
 ## Install dependencies
 
     git clone git://github.com/Zapotek/Roundabout.git

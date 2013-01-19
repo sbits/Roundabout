@@ -21,11 +21,11 @@ require 'roundabout/version'
 Gem::Specification.new do |s|
     s.name        = "roundabout"
     s.version     = Roundabout::VERSION
-    s.authors     = ["Tasos 'Zapotek' Laskos"]
+    s.authors     = ["Tasos 'Zapotek' Laskos", "Christian Pedaschus, SBITS"]
     s.email       = %w(tasos.laskos@gmail.com)
-    s.homepage    = "https://github.com/Zapotek/Roundabout"
-    s.summary     = %q{High-performance, distributed crawler.}
-    s.description = %q{The Roundabout crawler is an experiment on high-performance
+    s.homepage    = "https://github.com/sbits/Roundabout"
+    s.summary     = %q{High-performance, distributed crawler - with CSS support}
+    s.description = %q{This is a fork of: "https://github.com/Zapotek/Roundabout". The Roundabout crawler is an experiment on high-performance
     distributing techniques and their feasibility when it comes to website crawling.
 
     The name comes from the overall philosophy of the system which is to bypass
@@ -42,6 +42,6 @@ decision making points and instead focus on an intuitive prioritization and dist
     s.add_development_dependency 'awesome_print'
 
     s.add_runtime_dependency 'nokogiri'
-    s.add_runtime_dependency 'typhoeus'
+    #s.add_runtime_dependency 'typhoeus'
     s.add_runtime_dependency 'arachni-rpc-em'
 end

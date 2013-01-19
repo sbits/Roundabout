@@ -18,32 +18,18 @@
 
 =end
 
-require 'uri'
-require 'webrick'
-
 #
-# General utilities
+# Extracts paths (to be crawled) from CSS code.
 #
-# @author Tasos "Zapotek" Laskos <tasos.laskos@gmail.com>
+# @author Christian Pedaschus <chris@sbits.ac>
 #
-module Roundabout::Utilities
-	def uri_parser
-		@@uri_parser ||= ::URI::Parser.new
+class Roundabout::CssPathExtractor
+
+	def run(doc)
+		doc.map do |row|
+			## extract url from "url(/foobar.url)"
+			row[:value].match(/.*\(([^)]*)\)/).to_a[1]
+		end.uniq.compact
 	end
 
-	def uri_parse(url)
-		begin
-			uri_parser.parse(url)
-		rescue ::URI::InvalidURIError
-			uri_parser.parse(::WEBrick::HTTPUtils.escape(url))
-		end
-	end
-
-	def uri_encode(*args)
-		uri_parser.escape(*args)
-	end
-
-	def uri_decode(*args)
-		uri_parser.unescape(*args)
-	end
 end

@@ -12,8 +12,12 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+		All adjustments made by @author Christian Pedaschus <chris@sbits.ac>
+		use the original license. Thanks 'Zapotek' :)
+
 =end
 
 module Roundabout
-    VERSION = '0.0.1'
+	VERSION = '0.0.2'
 end

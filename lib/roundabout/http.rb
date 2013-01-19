@@ -12,9 +12,17 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+		All adjustments made by @author Christian Pedaschus <chris@sbits.ac>
+		use the original license. Thanks 'Zapotek' :)
+
 =end
 
 require 'typhoeus'
+
+#Typhoeus.configure do |config|
+#	config.verbose=true
+#end
 
 #
 # Default HTTP interface
@@ -27,91 +35,91 @@ require 'typhoeus'
 #
 class Roundabout::HTTP
 
-    # @return   [Integer]   amount of requests which haven't yet gotten a response
-    attr_reader :pending_requests
+	# @return   [Integer]   amount of requests which haven't yet gotten a response
+	attr_reader :pending_requests
 
-    #
-    # @param    [Hash]  opts Connection, request and header options
-    #                       * connection: Typhoeus::Hydra options
-    #                       * request: Typhoeus::Request options
-    #                       * headers: request headers hash
-    #
-    def initialize( opts = {} )
-        @default_headers = {
-            'User-Agent' => 'Roundabout-crawler/' + Roundabout::VERSION.to_s
-        }.merge( opts[:headers] || {} )
+	#
+	# @param    [Hash]  opts Connection, request and header options
+	#                       * connection: Typhoeus::Hydra options
+	#                       * request: Typhoeus::Request options
+	#                       * headers: request headers hash
+	#
+	def initialize(opts = {})
+		@default_headers = {
+				'User-Agent' => 'Roundabout-crawler/' + Roundabout::VERSION.to_s
+		}.merge(opts[:headers] || {})
 
-        @connection_options = {
-            max_concurrency: 20
-        }.merge( opts[:connection] || {} )
+		@connection_options = {
+				max_concurrency: 1
+		}.merge(opts[:connection] || {})
 
-        @request_options = {
-            follow_location:               true,
-            max_redirects:                 5,
-            disable_ssl_peer_verification: true
-        }.merge( opts[:request] || {} )
+		@request_options = {
+				followlocation: true,
+				maxredirs: 5,
+				ssl_verifypeer: false
+		}.merge(opts[:request] || {})
 
-        @pending_requests = 0
-    end
+		@pending_requests = 0
+	end
 
-    #
-    # @param    [Block]  block  to call once all requests have completed ({#pending_requests} == 0)
-    #
-    def on_complete( &block )
-        raise 'Required block missing!' if !block_given?
-        @on_complete = block
-    end
+	#
+	# @param    [Block]  block  to call once all requests have completed ({#pending_requests} == 0)
+	#
+	def on_complete(&block)
+		raise 'Required block missing!' if !block_given?
+		@on_complete = block
+	end
 
-    #
-    # Performs a GET request
-    #
-    # @param    [String]    url
-    # @param    [Hash]      opts    Typhoeus::Request options
-    # @param    [Block]     block   to be passed the {Response}
-    #
-    def get( url, opts = {}, &block )
-        request( :get, url, opts, &block )
-    end
+	#
+	# Performs a GET request
+	#
+	# @param    [String]    url
+	# @param    [Hash]      opts    Typhoeus::Request options
+	# @param    [Block]     block   to be passed the {Response}
+	#
+	def get(url, opts = {}, &block)
+		request(:get, url, opts, &block)
+	end
 
-    def shutdown
-        @hydra_thread.kill
-    end
+	def shutdown
+		@hydra_thread.kill
+	end
 
-    private
-    def request( method, url, opts = {}, &block )
-        increase_pending
-        opts[:headers] ||= {}
-        opts[:headers].merge!( @default_headers )
+	private
+	def request(method, url, opts = {}, &block)
+		increase_pending
+		opts[:headers] ||= {}
+		opts[:headers].merge!(@default_headers)
 
-        @hydra ||= Typhoeus::Hydra.new( @connection_options )
-        req = Typhoeus::Request.new( url, @request_options.merge( opts.merge( method: method ) ) )
-        req.on_complete {
-            |res|
-            block.call( Response.new(
-                code: res.code,
-                url: res.effective_url,
-                headers: res.headers_hash,
-                body: res.body
-            ))
-            decrease_pending
-        }
-        @hydra.queue( req )
+		@hydra ||= Typhoeus::Hydra.new(@connection_options)
+		req = Typhoeus::Request.new(url, @request_options.merge(opts.merge(method: method)))
+		req.on_complete {
+				|res|
+			block.call Roundabout::HTTP::Response.new(
+					           code: res.code,
+					           url: res.effective_url,
+					           total_time: res.total_time,
+					           headers: res.headers_hash,
+					           body: res.body
+			           )
+			decrease_pending
+		}
+		@hydra.queue(req)
+		@hydra_thread ||= Thread.new { @hydra.run while sleep(0.1) }
+		true
+	end
 
-        @hydra_thread ||= Thread.new { @hydra.run while sleep( 0.1 ) }
-        true
-    end
+	def decrease_pending
+		@pending_requests -= 1
+		call_on_complete if @pending_requests == 0
+	end
 
-    def decrease_pending
-        @pending_requests -= 1
-        call_on_complete if @pending_requests == 0
-    end
+	def increase_pending
+		@pending_requests += 1
+	end
 
-    def increase_pending
-        @pending_requests += 1
-    end
-
-    def call_on_complete
-        @on_complete.call if @on_complete
-    end
+	def call_on_complete
+		@on_complete.call if @on_complete
+	end
 
 end

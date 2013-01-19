@@ -18,32 +18,17 @@
 
 =end
 
-require 'uri'
-require 'webrick'
+#
+# Extracts AJAX paths (to be crawled) from HTML code.
+#
+# @author Christian Pedaschus <chris@sbits.ac>
+#
+class Roundabout::AjaxPathExtractor
 
-#
-# General utilities
-#
-# @author Tasos "Zapotek" Laskos <tasos.laskos@gmail.com>
-#
-module Roundabout::Utilities
-	def uri_parser
-		@@uri_parser ||= ::URI::Parser.new
-	end
-
-	def uri_parse(url)
-		begin
-			uri_parser.parse(url)
-		rescue ::URI::InvalidURIError
-			uri_parser.parse(::WEBrick::HTTPUtils.escape(url))
+	def run(doc)
+		doc.search("//a[@href and @data-remote='true']").map do |a|
+			a['href'].dup << ".js"
 		end
 	end
 
-	def uri_encode(*args)
-		uri_parser.escape(*args)
-	end
-
-	def uri_decode(*args)
-		uri_parser.unescape(*args)
-	end
 end
